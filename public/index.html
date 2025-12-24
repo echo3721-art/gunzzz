@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3D FPS Fixed</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Arial', sans-serif; user-select: none; }
+        #ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 10; color: white; flex-direction: column; }
+        .btn { padding: 15px 40px; font-size: 24px; cursor: pointer; border: none; margin: 10px; color: white; font-weight: bold; }
+        .red { background: #d32f2f; } .blue { background: #1976d2; }
+        
+        #hud { position: absolute; bottom: 20px; left: 20px; z-index: 5; pointer-events: none; display: none; }
+        #hp-bar { width: 300px; height: 30px; background: #333; border: 2px solid white; }
+        #hp-fill { width: 100%; height: 100%; background: #00e676; transition: width 0.2s; }
+        
+        #inventory { margin-top: 10px; display: flex; gap: 5px; }
+        .slot { background: rgba(0,0,0,0.5); color: #888; padding: 10px 20px; border: 1px solid #555; font-weight: bold; }
+        .active { border: 2px solid #ffeb3b; color: white; background: rgba(0,0,0,0.8); }
+
+        #crosshair { position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: #0f0; transform: translate(-50%, -50%); pointer-events: none; z-index: 4; }
+        #death-screen { position: absolute; top: 40%; width: 100%; text-align: center; color: red; font-size: 50px; font-weight: bold; display: none; text-shadow: 2px 2px black; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <h1>WARZONE FIXED</h1>
+        <p>WASD to Move | SPACE to Jump | CLICK to Shoot | RIGHT CLICK to Zoom</p>
+        <div>
+            <button class="btn red" onclick="join('red')">RED TEAM</button>
+            <button class="btn blue" onclick="join('blue')">BLUE TEAM</button>
+        </div>
+    </div>
+
+    <div id="death-screen">YOU DIED</div>
+
+    <div id="hud">
+        <div id="hp-bar"><div id="hp-fill"></div></div>
+        <div id="inventory">
+            <div id="s1" class="slot">1. SNIPER</div>
+            <div id="s2" class="slot">2. AK-47</div>
+            <div id="s5" class="slot">3. KNIFE</div>
+        </div>
+    </div>
+    
+    <div id="crosshair"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }</script>
+    <script type="module" src="game.js"></script>
+    <script>
+        function join(team) {
+            window.dispatchEvent(new CustomEvent('join', { detail: team }));
+            document.getElementById('ui').style.display = 'none';
+            document.getElementById('hud').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
