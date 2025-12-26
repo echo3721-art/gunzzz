@@ -7,51 +7,94 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+const PORT = process.env.PORT || 3000;
+
+// Serve static files from the root directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-let players = {};
+// Game State
+const players = {};
 
 io.on('connection', (socket) => {
-    players[socket.id] = {
-        id: socket.id,
-        position: { x: 0, y: 1, z: 0 },
-        rotation: { y: 0 },
-        team: null,
-        hp: 100
-    };
+    console.log(`User connected: ${socket.id}`);
 
+    // Handle Player Joining
     socket.on('join-game', (data) => {
-        players[socket.id].team = data.team;
-        players[socket.id].position = { x: data.team === 'red' ? -60 : 60, y: 1, z: 0 };
-        io.emit('player-joined', players[socket.id]);
-        socket.emit('current-players', players);
+        players[socket.id] = {
+            id: socket.id,
+            team: data.team, // 'red' or 'blue'
+            hp: 100,
+            position: { x: 0, y: 0, z: 0 },
+            rotation: { y: 0 }
+        };
+
+        // Notify others about the new player
+        socket.broadcast.emit('player-moved', players[socket.id]);
+        
+        // Send existing players to the newcomer
+        Object.values(players).forEach(p => {
+            if (p.id !== socket.id) {
+                socket.emit('player-moved', p);
+            }
+        });
     });
 
+    // Handle Movement
     socket.on('move', (data) => {
         if (players[socket.id]) {
             players[socket.id].position = data.position;
             players[socket.id].rotation = data.rotation;
-            socket.broadcast.emit('player-moved', players[socket.id]);
+            
+            // Broadcast movement to all other players
+            socket.broadcast.emit('player-moved', {
+                id: socket.id,
+                position: data.position,
+                rotation: data.rotation,
+                team: players[socket.id].team
+            });
         }
     });
 
+    // Handle Damage
     socket.on('take-damage', (data) => {
         const victim = players[data.victimId];
         if (victim && victim.hp > 0) {
             victim.hp -= data.damage;
-            io.emit('hp-update', { id: data.victimId, hp: victim.hp });
+
+            // Update all clients on health
+            io.emit('hp-update', { id: victim.id, hp: victim.hp });
+
+            // Check for death
             if (victim.hp <= 0) {
-                victim.hp = 100;
-                victim.position = { x: victim.team === 'red' ? -60 : 60, y: 1, z: 0 };
-                io.emit('player-respawn', { id: data.victimId, position: victim.position });
+                io.emit('player-died', { id: victim.id });
+
+                // Respawn Timer (3 seconds)
+                setTimeout(() => {
+                    if (players[victim.id]) {
+                        victim.hp = 100;
+                        // Respawn coordinates based on team
+                        const respawnPos = victim.team === 'red' ? 
+                            { x: -60, y: 5, z: 0 } : { x: 60, y: 5, z: 0 };
+                        
+                        victim.position = respawnPos;
+                        io.emit('player-respawn', { 
+                            id: victim.id, 
+                            position: respawnPos 
+                        });
+                    }
+                }, 3000);
             }
         }
     });
 
+    // Handle Disconnect
     socket.on('disconnect', () => {
+        console.log(`User disconnected: ${socket.id}`);
         delete players[socket.id];
-        io.emit('player-disconnected', socket.id);
+        io.emit('player-died', { id: socket.id }); // Removes mesh from other clients
     });
 });
 
-server.listen(3000, () => console.log('Server running on port 3000'));
+server.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});
