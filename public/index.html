@@ -95,40 +95,136 @@
 
         #crosshair { position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: #0f0; transform: translate(-50%, -50%); pointer-events: none; z-index: 4; }
         #death-screen { position: absolute; top: 40%; width: 100%; text-align: center; color: red; font-size: 50px; font-weight: bold; display: none; text-shadow: 2px 2px black; }
+        
+        /* Text Input Holder */
+        #text-input-holder { position: absolute; bottom: 80px; left: 20px; z-index: 5; }
+        #name-input { background: rgba(0,0,0,0.8); border: 1px solid #555; color: white; padding: 8px 12px; border-radius: 4px; font-size: 14px; width: 200px; outline: none; }
+        #name-input:focus { border-color: #ffeb3b; box-shadow: 0 0 5px rgba(255,235,59,0.3); }
+        
+        /* Score Board */
+        #score-board { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px; border: 2px solid white; }
+        .team-score { color: white; font-size: 18px; font-weight: bold; margin: 5px 0; }
+        .red-score { color: #ff6666; }
+        .blue-score { color: #6666ff; }
+        
+        /* Kill Notification */
+        #kill-notification { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,255,0,0.8); color: white; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; display: none; animation: fadeInOut 3s ease-in-out; }
+        
+        /* Win Announcement */
+        #win-announcement { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); color: white; padding: 20px 40px; border-radius: 10px; font-size: 32px; font-weight: bold; text-align: center; display: none; border: 3px solid #ffeb3b; animation: pulse 1s infinite; }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        /* Mobile Controls */
+        #mobile-controls { position: absolute; bottom: 20px; left: 20px; z-index: 15; display: none; }
+        #joystick-container { position: relative; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; }
+        #joystick { position: absolute; width: 40px; height: 40px; background: rgba(255,255,255,0.8); border-radius: 50%; top: 40px; left: 40px; pointer-events: none; }
+        
+        #mobile-buttons { position: absolute; bottom: 20px; right: 20px; z-index: 15; display: none; }
+        .mobile-btn { position: absolute; width: 60px; height: 60px; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); border-radius: 50%; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 12px; user-select: none; }
+        #fire-btn { bottom: 0; right: 0; background: rgba(255,0,0,0.3); }
+        #jump-btn { bottom: 70px; right: 70px; background: rgba(0,255,0,0.3); }
+        #aim-btn { bottom: 0; right: 70px; background: rgba(0,0,255,0.3); }
+        
+        /* Mobile Weapon Icons */
+        #mobile-weapons { position: absolute; top: 20px; left: 20px; z-index: 15; display: none; gap: 10px; }
+        .mobile-weapon { width: 50px; height: 50px; background: rgba(0,0,0,0.7); border: 2px solid rgba(255,255,255,0.5); border-radius: 10px; color: white; font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: all 0.2s ease; }
+        .mobile-weapon:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+        .mobile-weapon.active { background: rgba(255,235,59,0.5); border-color: #ffeb3b; box-shadow: 0 0 10px rgba(255,235,59,0.5); }
+        
+        /* Player name tags */
+        .player-name { position: absolute; color: white; background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 4px; font-size: 14px; font-weight: bold; pointer-events: none; z-index: 10; transform: translate(-50%, -50%); white-space: nowrap; }
+        
+        /* Score Board */
+        #score-board { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px; border: 2px solid white; }
+        .team-score { color: white; font-size: 18px; font-weight: bold; margin: 5px 0; }
+        .red-score { color: #ff6666; }
+        .blue-score { color: #6666ff; }
     </style>
 </head>
 <body>
-    <div id="ui">
-        <h1>WARZONE FIXED</h1>
-        <p>WASD to Move | SPACE to Jump | CLICK to Shoot | RIGHT CLICK to Zoom</p>
-        <div>
-            <button class="btn red" onclick="join('red')">RED TEAM</button>
-            <button class="btn blue" onclick="join('blue')">BLUE TEAM</button>
-        </div>
+<div id="ui">
+    <h1>WARZONE FIXED</h1>
+    <p>WASD to Move | SPACE to Jump | CLICK to Shoot | RIGHT CLICK to Zoom</p>
+
+    <input type="text" id="username" placeholder="Enter Your Name" maxlength="15"
+           style="padding: 10px; font-size: 20px; text-align: center; width: 200px; margin-bottom: 15px;">
+
+    <div>
+        <button class="btn red" onclick="joinGame('red')">RED TEAM</button>
+        <button class="btn blue" onclick="joinGame('blue')">BLUE TEAM</button>
     </div>
+</div>
 
-    <div id="death-screen">YOU DIED</div>
-
-    <div id="hud">
-        <div id="hp-bar"><div id="hp-fill"></div></div>
-        <div id="inventory">
-            <div id="s1" class="slot">1. SNIPER</div>
-            <div id="s2" class="slot">2. AK-47</div>
-            <div id="s5" class="slot">3. KNIFE</div>
-        </div>
+<div id="death-screen">YOU DIED<br><span style="font-size: 24px;">Respawning in <span id="respawn-timer">3</span>...</span></div>
+<div id="hud">
+    <div id="hp-bar"><div id="hp-fill"></div></div>
+    <div id="ammo">30 / 120</div>
+    <div id="text-input-holder">
+        <input type="text" id="name-input" placeholder="Type your name..." maxlength="15" style="padding: 5px; font-size: 14px; background: rgba(0,0,0,0.8); border: 1px solid white; color: white; border-radius: 3px; width: 200px;">
+        <button id="voice-btn" style="position: absolute; bottom: 20px; right: 20px; padding: 10px 15px; background: rgba(0,255,0,0.8); border: 2px solid white; color: white; border-radius: 5px; cursor: pointer; font-size: 16px; z-index: 15;">🎤 Voice</button>
     </div>
-    
-    <div id="crosshair"></div>
+    <div id="score-board">
+        <div class="team-score red-score">RED: <span id="red-score">0</span></div>
+        <div class="team-score blue-score">BLUE: <span id="blue-score">0</span></div>
+    </div>
+    <div id="kill-notification"></div>
+    <div id="win-announcement"></div>
+    <div class="slot" id="s1">1</div>
+    <div class="slot" id="s2">2</div>
+    <div class="slot" id="s5">5</div>
+</div>
+<div id="crosshair"></div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }</script>
-    <script type="module" src="game.js"></script>
-    <script>
-        function join(team) {
-            window.dispatchEvent(new CustomEvent('join', { detail: team }));
-            document.getElementById('ui').style.display = 'none';
-            document.getElementById('hud').style.display = 'block';
-        }
-    </script>
+<!-- Mobile Controls -->
+<div id="mobile-controls">
+    <div id="joystick-container">
+        <div id="joystick"></div>
+    </div>
+</div>
+<div id="mobile-buttons">
+    <div id="fire-btn" class="mobile-btn">FIRE</div>
+    <div id="jump-btn" class="mobile-btn">JUMP</div>
+    <div id="aim-btn" class="mobile-btn">AIM</div>
+</div>
+<div id="mobile-weapons">
+    <div id="weapon-sniper" class="mobile-weapon active" data-weapon="0">🔫</div>
+    <div id="weapon-ak" class="mobile-weapon" data-weapon="1">🔫</div>
+    <div id="weapon-knife" class="mobile-weapon" data-weapon="2">🔪</div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script type="importmap">{ 
+    "imports": { 
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    } 
+}</script>
+<script type="module" src="game.js"></script>
+
+<script>
+    // NEW wrapper function to get name
+    function joinGame(team) {
+        const nameInput = document.getElementById('username').value;
+        const name = nameInput || "Soldier " + Math.floor(Math.random() * 999);
+
+        // Dispatch event with BOTH team and name
+        window.dispatchEvent(new CustomEvent('join', { detail: { team: team, name: name } }));
+
+        document.getElementById('ui').style.display = 'none';
+        document.getElementById('hud').style.display = 'block';
+    }
+</script>
 </body>
 </html>
